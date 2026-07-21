@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17181C">
+<title>Platelog</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+:root{
+  --bg:#17181C; --surface:#1F2127; --surface2:#26292F; --line:#31343B;
+  --chalk:#E8E6E1; --steel:#8A8D96;
+  --green:#43A05E; --greenbg:#1C2B22;
+  --yellow:#D9A62E; --yellowbg:#2B2619;
+  --red:#C6473E; --redbg:#2B1C1A;
+  --blue:#3D6FA8; --bluebg:#1B2330;
+  --disp:'Roboto Condensed','Barlow Condensed','Arial Narrow',sans-serif;
+  --body:'Roboto','Barlow',-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--chalk);font-family:var(--body);font-size:15px}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+a{color:var(--blue);text-decoration:none;font-weight:600}
+#wrap{max-width:560px;margin:0 auto;padding:16px 16px 96px}
+header{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.bars{display:flex;gap:3px}
+.bars span{width:6px;height:22px;border-radius:3px}
+h1{font-family:var(--disp);font-size:22px;letter-spacing:.14em;text-transform:uppercase;margin:0;font-weight:700}
+#offline{display:none;margin-left:auto;color:var(--yellow);font-size:12px;font-weight:700;letter-spacing:.06em}
+body.offline #offline{display:block}
+.eyebrow{font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.pick{display:block;width:100%;text-align:left;margin-top:10px;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.pick.next{background:var(--surface2);border-color:rgba(232,230,225,.2)}
+.pick .t{font-family:var(--disp);font-weight:700;font-size:24px;text-transform:uppercase;color:var(--chalk);display:flex;justify-content:space-between;align-items:center}
+.pick .s{color:var(--steel);font-size:13px;margin-top:4px}
+.sug{color:var(--green);font-size:12px;font-weight:700;letter-spacing:.08em}
+.exname{font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:.02em;text-transform:uppercase}
+.meta{color:var(--steel);font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}
+.rowhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.formbtn{background:none;border:1px solid var(--line);border-radius:8px;color:var(--steel);font-size:12px;padding:4px 10px;flex-shrink:0}
+.chip{display:flex;align-items:center;gap:8px;border-radius:8px;padding:6px 10px;margin-top:8px;border:1px solid;font-size:13px}
+.chip b{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-right:2px}
+.chip .dot{width:10px;height:10px;border-radius:999px;flex-shrink:0}
+.chip.up{background:var(--greenbg);border-color:rgba(67,160,94,.3)} .chip.up b{color:var(--green)} .chip.up .dot{background:var(--green)}
+.chip.hold{background:var(--yellowbg);border-color:rgba(217,166,46,.3)} .chip.hold b{color:var(--yellow)} .chip.hold .dot{background:var(--yellow)}
+.chip.down{background:var(--redbg);border-color:rgba(198,71,62,.3)} .chip.down b{color:var(--red)} .chip.down .dot{background:var(--red)}
+.chip.first{background:var(--bluebg);border-color:rgba(61,111,168,.3)} .chip.first b{color:var(--blue)} .chip.first .dot{background:var(--blue)}
+.panel{margin-top:10px;background:var(--surface2);border-radius:10px;padding:12px;font-size:13.5px;line-height:1.5}
+.cue{display:flex;gap:8px;margin-bottom:4px}
+.cue i{color:var(--steel);font-style:normal}
+.avoid{color:var(--red);margin-top:6px}
+.vidwrap{margin-top:10px}
+.vidwrap iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+.vidnote{color:var(--steel);font-size:12px;margin-top:5px}
+.vidbtn{margin-top:8px;background:var(--bluebg);border:1px solid rgba(61,111,168,.4);color:var(--chalk);border-radius:10px;padding:9px 12px;font-size:13.5px;font-weight:600;width:100%;text-align:left}
+.setrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.setrow:first-of-type{border-top:none}
+.setlbl{color:var(--steel);font-size:13px;width:36px;font-variant-numeric:tabular-nums}
+.winput{width:62px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--chalk);text-align:center;font-size:16px;font-variant-numeric:tabular-nums;outline:none}
+.winput::placeholder{color:var(--steel)}
+.bw{width:62px;text-align:center;color:var(--steel);font-size:13px}
+.step{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--chalk);font-size:20px;font-weight:600}
+.num{width:38px;text-align:center;font-variant-numeric:tabular-nums;font-size:18px;font-weight:600}
+.num.z{color:var(--steel)}
+.donebtn{margin-left:auto;width:48px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--steel);font-size:18px;font-weight:700}
+.donebtn.rdy{color:var(--chalk)}
+.donebtn.on{border-color:var(--green);background:var(--greenbg);color:var(--green)}
+.finishbar{position:fixed;left:0;right:0;bottom:64px;padding:0 16px;max-width:560px;margin:0 auto;z-index:5}
+.finish{width:100%;padding:14px 16px;border-radius:14px;border:none;background:var(--green);color:#0E1512;font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.finish:disabled{background:var(--surface2);color:var(--steel);box-shadow:none}
+.ghost{background:none;border:none;color:var(--steel);font-size:13px;text-decoration:underline;padding:0}
+.histhead{display:flex;width:100%;justify-content:space-between;align-items:center;background:none;border:none;padding:0;color:var(--chalk);text-align:left}
+.badge{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--bg);background:var(--chalk);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.histline{display:flex;justify-content:space-between;font-size:13.5px;padding:3px 0}
+.histline span:last-child{color:var(--steel);font-variant-numeric:tabular-nums}
+.detail{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.settings{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.settings button{flex:1;min-width:140px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--chalk);font-size:14px}
+.settings button.warn{border-color:var(--red);background:var(--redbg);color:var(--red);font-weight:700}
+.settings button.quiet{color:var(--steel)}
+.empty{color:var(--steel);font-size:14px;padding:24px 0;text-align:center}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 0 10px;z-index:10}
+nav button{background:none;border:none;padding:8px 18px;font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);border-bottom:2px solid transparent}
+nav button.active{color:var(--chalk);border-bottom-color:var(--green)}
+#toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid rgba(67,160,94,.4);color:var(--chalk);border-radius:12px;padding:10px 16px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:20;white-space:nowrap}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <div class="bars"><span style="background:#C6473E"></span><span style="background:#3D6FA8"></span><span style="background:#D9A62E"></span><span style="background:#43A05E"></span></div>
+    <h1>Platelog</h1>
+    <div id="offline">OFFLINE</div>
+  </header>
+  <div id="app"></div>
+</div>
+<div id="toast" hidden></div>
+<nav>
+  <button data-a="tab" data-t="session" class="active">Session</button>
+  <button data-a="tab" data-t="history">History</button>
+  <button data-a="tab" data-t="library">Exercises</button>
+</nav>
+<input type="file" id="importfile" accept="application/json" hidden>
+<script>
+"use strict";
+/* ============ Jeff Nippard demo videos (channel-verified) ============ */
+const VID = {
+  legpress:    {id:"kIXcoivzGf8", t:"The Best & Worst Quad Exercises"},
+  inclinedb:   {id:"ptpmRrzRtWQ", t:"Blow Up Your Bench Press (4 Steps)"},
+  latpulldown: {id:"O94yEoGXtBY", t:"Build a V-Tapered Back"},
+  legcurl:     {id:"0a_fVS2s4Ho", t:"How to Train Hamstrings (Science Explained)"},
+  latraise:    {id:"v_ZkxWzYnMc", t:"Capped Shoulders: Side Delts"},
+  facepull:    {id:"qfc70k40318", t:"Boulder Rear Delts"},
+  cablecurl:   {id:"GNO4OtYoCYk", t:"Best & Worst Biceps Exercises"},
+  pressdown:   {id:"OpRMRhr0Ycc", t:"Best & Worst Triceps Exercises"},
+  cablecrunch: {id:"Tn-XvYG9x7w", t:"Get Abs in 60 Days"},
+  squat:       {id:"bEv6CCg2BC8", t:"Huge Squat, Perfect Technique"},
+  inclinesmith:{id:"vcBig73ojpE", t:"Huge Bench, Perfect Technique"},
+  cablerow:    {id:"PAXkl-AdJFg", t:"Back Width vs Thickness"},
+  rdl:         {id:"_oyxCn2iSjU", t:"How to Do RDLs"},
+  machinepress:{id:"_RlRDWO2jfg", t:"Overhead Press Technique"},
+  latraise1:   {id:"SgyUoY0IZ7A", t:"Best & Worst Shoulder Exercises"},
+  hammercurl:  {id:"GNO4OtYoCYk", t:"Best & Worst Biceps Exercises"},
+  revcrunch:   {id:"Tn-XvYG9x7w", t:"Get Abs in 60 Days"}
+};
+
+/* ============ Program ============ */
+const EX = {
+  legpress:{name:"Leg Press",sets:3,min:8,max:12,
+    cues:["Feet lower on the platform, about hip width, to bias the quads.","Control deep — thighs toward chest — without the lower back curling off the pad.","Press through the whole foot; stop just short of locked knees to keep tension."],
+    avoid:"Cutting depth as weight climbs · Knees caving inward"},
+  inclinedb:{name:"Incline Dumbbell Press",sets:3,min:8,max:12,
+    cues:["Bench ~30°. Squeeze the shoulder blades back and down and keep them pinned.","Lower with elbows ~45° until you feel a deep stretch across the upper chest.","Press up and slightly back; wrists stacked over elbows."],
+    avoid:"Flaring elbows to 90° · Bouncing out of the bottom"},
+  latpulldown:{name:"Wide-Grip Lat Pulldown",sets:3,min:8,max:12,
+    cues:["Grip a hand-width outside the shoulders; chest tall, slight lean back.","Drive the elbows down and in — bar toward the collarbone.","Let the weight pull you into a full stretch at the top of every rep."],
+    avoid:"Swinging the torso · Cutting the stretch short"},
+  legcurl:{name:"Seated Leg Curl",sets:2,min:10,max:15,
+    cues:["Set the pad snug; hips glued down for the whole set.","Curl to a hard squeeze — control the entire range.","Take 2–3 seconds on the way back to the stretch."],
+    avoid:"Hips lifting to cheat · Letting the stack slam"},
+  latraise:{name:"Cable Lateral Raise",sets:3,min:12,max:20,
+    cues:["Set the cable low and lean slightly away from the stack.","Lead with the elbow, raising out to shoulder height — no higher needed.","Fight the negative; the lowering half builds the cap too."],
+    avoid:"Shrugging the traps into it · Swinging heavy weight up"},
+  facepull:{name:"Face Pull",sets:2,min:15,max:20,
+    cues:["Rope at upper-chest height; pull toward your eye line.","Elbows high and wide; finish with knuckles facing behind you.","Light loads, strict reps — this is position work, not ego work."],
+    avoid:"Turning it into a row · Overloading"},
+  cablecurl:{name:"Cable Biceps Curl",sets:2,min:10,max:15,
+    cues:["Elbows pinned at your sides; curl to a full squeeze.","Lower on a 2–3 second count into a complete stretch.","The stretched bottom half is where growth lives — never cut it."],
+    avoid:"Elbows drifting forward · Leaning back to finish reps"},
+  pressdown:{name:"Rope Triceps Pressdown",sets:2,min:10,max:15,
+    cues:["Elbows locked at your sides for the entire set.","Press to full lockout and split the rope slightly at the bottom.","Control up until the forearms pass parallel."],
+    avoid:"Elbows flaring on heavy sets · Leaning onto the cable"},
+  cablecrunch:{name:"Cable Crunch",sets:2,min:10,max:15,
+    cues:["Kneel facing the stack, rope beside your ears.","Crunch ribs toward pelvis — round the spine, hips stay still.","Slow return to a tall stretch each rep."],
+    avoid:"Pulling with the arms · Hinging at the hips"},
+  squat:{name:"Barbell Back Squat",sets:3,min:6,max:10,
+    cues:["Big breath, brace 360° before you break at the hips.","Sit down between the hips with knees tracking over the toes.","Parallel or below as mobility allows, then drive up through mid-foot."],
+    avoid:"Knees caving in · Chest collapsing out of the hole"},
+  inclinesmith:{name:"Incline Smith Press",sets:3,min:8,max:12,
+    cues:["Set the bench so the bar path meets the upper chest.","Shoulder blades pinned; touch under control — no bounce.","Press to lockout without snapping the elbows."],
+    avoid:"Bench too steep (turns into shoulders) · Bouncing off the chest"},
+  cablerow:{name:"Seated Cable Row",sets:3,min:8,max:12,
+    cues:["Chest tall; allow a slight reach forward at the start.","Pull to the lower ribs and squeeze the blades together.","Resist the cable on the way back — don't get yanked."],
+    avoid:"Rocking for momentum · Shrugging toward the ears"},
+  rdl:{name:"Romanian Deadlift",sets:2,min:8,max:12,
+    cues:["Soft knees, shins near vertical; push the hips straight back.","Bar close, lats tight, back flat — stretch to just below the knees.","Drive the hips through to stand; squeeze glutes, don't lean back."],
+    avoid:"Squatting it with the knees · Rounding the lower back"},
+  machinepress:{name:"Machine Shoulder Press",sets:2,min:8,max:12,
+    cues:["Seat set so handles start around ear height.","Press to lockout without shrugging the shoulders up.","Lower under control back to the ears every rep."],
+    avoid:"Arching off the pad · Half reps at the bottom"},
+  latraise1:{name:"1-Arm Cable Lateral Raise",sets:3,min:12,max:20,perSide:true,
+    cues:["Cable low, stand side-on; a touch of body lean is fine.","Raise across the body out to shoulder height, leading with the elbow.","Own the negative — no dropping between reps."],
+    avoid:"Twisting the torso · Rushing the tempo"},
+  hammercurl:{name:"Hammer Curl",sets:2,min:10,max:15,
+    cues:["Neutral grip, elbows quiet at your sides.","Curl to the shoulder and squeeze the forearm hard.","Lower slowly to a dead hang before the next rep."],
+    avoid:"Swinging the bells up · Cutting the lowering short"},
+  revcrunch:{name:"Reverse Crunch",sets:2,min:10,max:15,bw:true,
+    cues:["Lie flat, knees bent to 90°.","Curl the pelvis up toward the ribs — think tuck, not kick.","Lower slowly; the lower back never pops off the floor."],
+    avoid:"Swinging the legs · Arching on the way down"}
+};
+const PROGRAM = {
+  A:{title:"Workout A",order:["legpress","inclinedb","latpulldown","legcurl","latraise","facepull","cablecurl","pressdown","cablecrunch"]},
+  B:{title:"Workout B",order:["squat","inclinesmith","cablerow","rdl","machinepress","latraise1","hammercurl","pressdown","revcrunch"]}
+};
+
+/* ============ State ============ */
+const KEY="platelog:v1";
+const DEF=()=>({unit:"kg",sessions:[],draft:null});
+function load(){try{const r=localStorage.getItem(KEY);return r?Object.assign(DEF(),JSON.parse(r)):DEF();}catch(e){return DEF();}}
+let state=load();
+let tab="session", open={}, openVid={}, openHist=null, openLib=null, confirmReset=false, resetTimer=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){toast("Storage full — export your log");}}
+
+/* ============ Helpers ============ */
+const $=s=>document.querySelector(s);
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmtDate(ts){return new Date(ts).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});}
+function lastEntry(exId){
+  for(let i=state.sessions.length-1;i>=0;i--){
+    const e=(state.sessions[i].entries||{})[exId];
+    if(e){const d=e.filter(s=>s&&s.done&&s.r>0);
+      if(d.length){return {weight:Math.max(...d.map(s=>Number(s.w)||0)),sets:d};}}
+  }
+  return null;
+}
+function prog(ex,last){
+  if(!last)return {cls:"first",label:"First session",msg:"Pick a weight that leaves 2–3 reps in reserve."};
+  const allTop=last.sets.every(s=>s.r>=ex.max), anyUnder=last.sets.some(s=>s.r<ex.min);
+  if(allTop)return ex.bw
+    ? {cls:"up",label:"Level up",msg:"All sets topped out — slow the lowering to 3s, or climb the ladder."}
+    : {cls:"up",label:"Add weight",msg:"All sets hit "+ex.max+" — add the smallest jump, rebuild from "+ex.min+"."};
+  if(anyUnder)return {cls:"down",label:"Back off",msg:"A set fell under "+ex.min+" — drop ~10% and own the reps."};
+  return {cls:"hold",label:"Hold weight",msg:"Same load — push every set toward "+ex.max+"."};
+}
+function doneCount(entries){let n=0;Object.values(entries||{}).forEach(a=>a.forEach(s=>{if(s&&s.done)n++;}));return n;}
+function volume(sess){let v=0;Object.values(sess.entries||{}).forEach(a=>a.forEach(s=>{if(s&&s.done)v+=(Number(s.w)||0)*(Number(s.r)||0);}));return Math.round(v);}
+let toastT=null;
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600);}
+
+/* ============ Views ============ */
+function chipHtml(p){return '<div class="chip '+p.cls+'"><span class="dot"></span><div><b>'+p.label+'</b> <span>'+p.msg+'</span></div></div>';}
+
+function panelHtml(exId){
+  const ex=EX[exId], v=VID[exId];
+  let h='<div class="panel">';
+  ex.cues.forEach((c,i)=>{h+='<div class="cue"><i>'+(i+1)+'.</i><span>'+c+'</span></div>';});
+  h+='<div class="avoid">Avoid: '+ex.avoid+'</div>';
+  if(openVid[exId]){
+    h+='<div class="vidwrap"><iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.t)+'" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+      +'<div class="vidnote">Jeff Nippard — “'+esc(v.t)+'” · streams from YouTube, needs internet · <a href="https://www.youtube.com/watch?v='+v.id+'" target="_blank" rel="noreferrer">open on YouTube</a></div></div>';
+  }else{
+    h+='<button class="vidbtn" data-a="vid" data-ex="'+exId+'">▶ Load Jeff Nippard’s demo — “'+esc(v.t)+'”</button>';
+  }
+  return h+'</div>';
+}
+
+function currentSets(exId){
+  const ex=EX[exId];
+  if(state.draft.entries[exId])return state.draft.entries[exId];
+  const last=lastEntry(exId);
+  return Array.from({length:ex.sets},()=>({w:!ex.bw&&last?String(last.weight||""):"",r:0,done:false}));
+}
+function ensureEntry(exId){if(!state.draft.entries[exId]){state.draft.entries[exId]=currentSets(exId);}return state.draft.entries[exId];}
+
+function cardHtml(exId){
+  const ex=EX[exId], last=lastEntry(exId), p=prog(ex,last), sets=currentSets(exId), u=state.unit;
+  let meta=ex.sets+" × "+ex.min+"–"+ex.max+(ex.perSide?" / side":"")+(ex.bw?" · bodyweight":"");
+  if(last)meta+=ex.bw?" · Last: "+last.sets.map(s=>s.r).join(", ")+" reps":" · Last: "+last.weight+u+" — "+last.sets.map(s=>s.r).join(", ");
+  let h='<div class="card"><div class="rowhead"><div class="exname">'+ex.name+'</div>'
+    +'<button class="formbtn" data-a="form" data-ex="'+exId+'">'+(open[exId]?"Hide form":"Form")+'</button></div>'
+    +'<div class="meta">'+meta+'</div>'+chipHtml(p);
+  if(open[exId])h+=panelHtml(exId);
+  sets.forEach((s,i)=>{
+    h+='<div class="setrow"><span class="setlbl">Set '+(i+1)+'</span>';
+    h+=ex.bw?'<span class="bw">BW</span>'
+      :'<input class="winput" inputmode="decimal" placeholder="wt" value="'+esc(s.w)+'" data-a="w" data-ex="'+exId+'" data-i="'+i+'">';
+    h+='<button class="step" data-a="r-" data-ex="'+exId+'" data-i="'+i+'" aria-label="fewer reps">−</button>'
+      +'<span class="num'+(s.r?"":" z")+'">'+(s.r||"—")+'</span>'
+      +'<button class="step" data-a="r+" data-ex="'+exId+'" data-i="'+i+'" aria-label="more reps">+</button>'
+      +'<button class="donebtn'+(s.done?" on":s.r?" rdy":"")+'" data-a="done" data-ex="'+exId+'" data-i="'+i+'" aria-label="mark set done">✓</button></div>';
+  });
+  return h+'</div>';
+}
+
+function viewSession(){
+  if(!state.draft){
+    const lastS=state.sessions[state.sessions.length-1];
+    const next=lastS?(lastS.workout==="A"?"B":"A"):"A";
+    let h='<div class="eyebrow">Next up</div>';
+    ["A","B"].forEach(k=>{
+      const isNext=k===next, names=PROGRAM[k].order.map(id=>EX[id].name);
+      h+='<button class="pick'+(isNext?" next":"")+'" data-a="start" data-k="'+k+'"><div class="t"><span>Start '+PROGRAM[k].title+'</span>'
+        +(isNext?'<span class="sug">SUGGESTED</span>':"")+'</div><div class="s">'+names.slice(0,3).join(" · ")+" + "+(names.length-3)+" more</div></button>";
+    });
+    h+=lastS?'<div class="meta" style="margin-top:14px">Last session: '+PROGRAM[lastS.workout].title+', '+fmtDate(lastS.date)+'. Rotation runs A/B/A then B/A/B with rest days between.</div>'
+            :'<div class="meta" style="margin-top:14px">No sessions yet — your log starts with the first set.</div>';
+    return h;
+  }
+  const n=doneCount(state.draft.entries);
+  let h='<div class="rowhead" style="margin:4px 0 12px"><div class="exname" style="font-size:26px">'+PROGRAM[state.draft.workout].title+'</div>'
+    +'<button class="ghost" data-a="discard">Discard</button></div>';
+  PROGRAM[state.draft.workout].order.forEach(id=>{h+=cardHtml(id);});
+  h+='<div class="finishbar"><button class="finish" data-a="finish"'+(n?"":" disabled")+'>Finish workout · '+n+(n===1?" set":" sets")+' logged</button></div>';
+  return h;
+}
+
+function viewHistory(){
+  if(!state.sessions.length)return '<div class="empty">Nothing here yet. Finish a workout and it lands in the book.</div>';
+  let h="";
+  [...state.sessions].reverse().forEach(s=>{
+    const isOpen=openHist===s.id, vol=volume(s);
+    h+='<div class="card"><button class="histhead" data-a="hist" data-id="'+s.id+'"><span style="display:flex;align-items:center;gap:10px">'
+      +'<span class="badge">'+s.workout+'</span><span><span style="font-weight:600;font-size:15px">'+fmtDate(s.date)+'</span><br>'
+      +'<span class="meta">'+doneCount(s.entries)+' sets'+(vol?' · '+vol.toLocaleString()+' '+state.unit+' moved':"")+'</span></span></span>'
+      +'<span style="color:var(--steel)">'+(isOpen?"▴":"▾")+'</span></button>';
+    if(isOpen){
+      h+='<div class="detail">';
+      PROGRAM[s.workout].order.forEach(exId=>{
+        const sets=((s.entries||{})[exId]||[]).filter(x=>x&&x.done);
+        if(!sets.length)return;
+        h+='<div class="histline"><span>'+EX[exId].name+'</span><span>'
+          +(EX[exId].bw?sets.map(x=>x.r).join(", ")+" reps":esc(sets[0].w||0)+state.unit+" — "+sets.map(x=>x.r).join(", "))+'</span></div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  return h;
+}
+
+function viewLibrary(){
+  let h="";
+  Object.keys(EX).forEach(exId=>{
+    const ex=EX[exId], last=lastEntry(exId), p=prog(ex,last), isOpen=openLib===exId;
+    const inA=PROGRAM.A.order.includes(exId), inB=PROGRAM.B.order.includes(exId);
+    h+='<div class="card"><button class="histhead" data-a="lib" data-ex="'+exId+'"><span><span class="exname" style="font-size:17px">'+ex.name+'</span>'
+      +'<span class="meta" style="display:inline;margin-left:8px">'+(inA&&inB?"A + B":inA?"A":"B")+' · '+ex.sets+'×'+ex.min+'–'+ex.max+'</span></span>'
+      +'<span class="dot" style="width:10px;height:10px;border-radius:999px;background:var(--'+(p.cls==="up"?"green":p.cls==="hold"?"yellow":p.cls==="down"?"red":"blue")+')"></span></button>';
+    if(isOpen){
+      h+='<div style="margin-top:10px">'+chipHtml(p)+panelHtml(exId)
+        +'<div class="meta" style="margin-top:8px">'
+        +(ex.bw?'Progression: every set at '+ex.max+' → slow the lowering, then climb the ladder (reverse crunch → captain’s chair → hanging).'
+               :'Progression: every set at '+ex.max+' → add the smallest jump, rebuild from '+ex.min+'.')+'</div></div>';
+    }
+    h+='</div>';
+  });
+  h+='<div class="settings">'
+    +'<button data-a="unit">Units: '+state.unit+' (label only)</button>'
+    +'<button data-a="export">Export log</button>'
+    +'<button data-a="import" class="quiet">Import log</button>'
+    +(confirmReset?'<button data-a="reset" class="warn">Tap again to erase</button>':'<button data-a="reset" class="quiet">Reset all data</button>')
+    +'</div>'
+    +'<div class="meta" style="margin-top:12px">Demos are Jeff Nippard’s videos, streamed from YouTube (internet required). Logging, history, and progression all work fully offline.</div>';
+  return h;
+}
+
+function render(){
+  $("#app").innerHTML = tab==="session"?viewSession():tab==="history"?viewHistory():viewLibrary();
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.t===tab));
+}
+
+/* ============ Actions ============ */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-a]"); if(!t)return;
+  const a=t.dataset.a, exId=t.dataset.ex, i=Number(t.dataset.i);
+  if(a==="tab"){tab=t.dataset.t;render();return;}
+  if(a==="start"){state.draft={workout:t.dataset.k,startedAt:Date.now(),entries:{}};save();render();return;}
+  if(a==="discard"){if(confirm("Discard this workout? Logged sets in it will be lost."))
+    {state.draft=null;save();render();}return;}
+  if(a==="form"){open[exId]=!open[exId];render();return;}
+  if(a==="vid"){openVid[exId]=true;render();return;}
+  if(a==="r+"||a==="r-"){
+    const sets=ensureEntry(exId), s=sets[i], ex=EX[exId];
+    s.r=a==="r+"?(s.r?s.r+1:ex.min):Math.max(0,s.r-1);
+    if(!s.r)s.done=false;
+    save();render();return;
+  }
+  if(a==="done"){
+    const sets=ensureEntry(exId), s=sets[i];
+    if(!s.r)return;
+    s.done=!s.done;save();render();return;
+  }
+  if(a==="finish"){
+    state.sessions.push({id:Date.now(),date:Date.now(),workout:state.draft.workout,entries:state.draft.entries});
+    const nxt=state.draft.workout==="A"?"B":"A";
+    state.draft=null;save();render();toast("Saved. Next up: Workout "+nxt+".");return;
+  }
+  if(a==="hist"){openHist=openHist===Number(t.dataset.id)?null:Number(t.dataset.id);render();return;}
+  if(a==="lib"){openLib=openLib===exId?null:exId;render();return;}
+  if(a==="unit"){state.unit=state.unit==="kg"?"lb":"kg";save();render();return;}
+  if(a==="export"){
+    const blob=new Blob([JSON.stringify(state,null,1)],{type:"application/json"});
+    const aEl=document.createElement("a");
+    aEl.href=URL.createObjectURL(blob);aEl.download="platelog-backup.json";aEl.click();
+    setTimeout(()=>URL.revokeObjectURL(aEl.href),2000);return;
+  }
+  if(a==="import"){$("#importfile").click();return;}
+  if(a==="reset"){
+    if(!confirmReset){confirmReset=true;render();clearTimeout(resetTimer);resetTimer=setTimeout(()=>{confirmReset=false;render();},4000);return;}
+    state=DEF();save();confirmReset=false;render();toast("Log cleared.");return;
+  }
+});
+
+document.addEventListener("input",e=>{
+  if(e.target.matches("input.winput")){
+    const exId=e.target.dataset.ex, i=Number(e.target.dataset.i);
+    e.target.value=e.target.value.replace(/[^0-9.]/g,"");
+    ensureEntry(exId)[i].w=e.target.value;save();
+  }
+});
+
+$("#importfile").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result);
+      if(!Array.isArray(d.sessions))throw 0;
+      if(confirm("Replace current log with "+d.sessions.length+" imported sessions?")){
+        state=Object.assign(DEF(),d);save();render();toast("Log imported.");
+      }
+    }catch(err){toast("That file isn't a Platelog backup.");}
+    e.target.value="";
+  };
+  rd.readAsText(f);
+});
+
+/* ============ Offline indicator + SW ============ */
+function net(){document.body.classList.toggle("offline",!navigator.onLine);}
+window.addEventListener("online",net);window.addEventListener("offline",net);net();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+render();
+</script>
+</body>
+</html>
